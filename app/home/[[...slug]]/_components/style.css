@@ -1,0 +1,123 @@
+
+
+@media (min-width: 400px) {
+    .hide-gt-400 {
+        display: none !important;
+    }
+}
+
+
+@media (max-width: 399px) {
+    .hide-lt-400 {
+        display: none !important;
+    }
+}
+
+  
+  .tr {
+    display: flex;
+  }
+  
+  tr,
+  .tr {
+    /* width: fit-content; */
+    height: 40px;
+  }
+  
+  th,
+  .th,
+  td,
+  .td {
+    /* box-shadow: inset 0 0 0 1px lightgray; */
+    padding: 0.25rem;
+  }
+  
+  th,
+  .th {
+    padding: 2px 4px;
+    position: relative;
+    font-weight: bold;
+    text-align: center;
+    height: 30px;
+    border-bottom: thin solid white;
+
+  }
+  
+  td,
+  .td {
+    height: 40px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden !important;
+    text-align: center;
+    vertical-align: middle;
+    border-bottom: 1px solid black;
+  }
+  
+  .resizer {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    right: 0;
+    width: 3px;
+    background: rgba(0, 0, 0, 0.5);
+    cursor: col-resize;
+    user-select: none;
+    touch-action: none;
+  }
+  
+  .resizer.isResizing {
+    background: blue;
+    opacity: 1;
+    height: 100vh;
+  }
+  
+  @media (hover: hover) {
+
+
+    .resizer {
+      opacity: 0;
+    }
+  
+    tr:hover .resizer {
+      opacity: 1;
+    }
+  }
+
+
+  td .size-cell{
+    display: flex;
+    gap: 4px;
+    width: 100%;
+    text-align: end;
+    padding-right: 5px;
+    justify-content: flex-end;
+  }
+  
+  th{
+    text-align: start;
+  }
+  
+  td .name-cell{
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    width: 100%;
+    text-align: start;
+  }
+
+  td .name-cell input[type=checkbox]{
+    background-color: red;
+  }
+
+  .name-header {
+    text-align: start;
+    padding-left: 2rem;
+}
+
+
+
+.size-cell-format{
+    width: 50px;
+    text-align: start;
+}

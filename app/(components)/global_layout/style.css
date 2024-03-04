@@ -1,0 +1,10 @@
+.searchbar-result-container{
+    z-index: 1000;
+    background: white;    
+}
+
+
+
+.search-result:hover {
+    background-color: red;
+}

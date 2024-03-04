@@ -13,15 +13,16 @@ body {
 .main-content{
     height: 100%;
     width: 100%;
-    background-color: green;
+    /* background-color: green; */
     overflow-y: auto;
+    padding-left: 10px;
+    padding-right: 10px;
 }
 
 .sidebar{
     left: 0;
-    width: 200px;
+    width: 250px;
     height: 100vh;
-    background-color: red;
     position: relative;
     overflow-y: auto;
 }
@@ -40,16 +41,15 @@ body {
 
 .sidebar-drawer-button{
     visibility: hidden;
+    display: none;
     opacity: 0;
 }
 
 @media (max-width: 900px) {
-    .main{
-        background-color: purple;
-    }
 
     .sidebar-closed {
         display: none !important;
+        visibility: hidden;
     }
     
     .sidebar-drawer-button{

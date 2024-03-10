@@ -39,7 +39,7 @@ export default function FileCopyModal({ isOpen, onOpen = () => { }, onClose = ()
           }}></BreadcrumbPath>
 
         </ModalBody>
-
+          
         <ModalFooter>
           <Button colorScheme='blue' mr={3} onClick={onClose}>
             Cancel

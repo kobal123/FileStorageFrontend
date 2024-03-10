@@ -1,8 +1,8 @@
 'use client'
-import { createContext, useContext, useEffect, useState } from "react"
+import { createContext, useContext, useEffect, useMemo, useState } from "react"
 import FileButtons from "./file-buttons"
 import FileGrid, { FileMetadata } from "./file-grid"
-import { Box, Checkbox, HStack, IconButton, Menu, MenuButton, MenuItem, MenuList, Skeleton, Spacer, Spinner, Table, TableCaption, TableContainer, Tbody, Td, Tfoot, Th, Thead, Tr, VStack, useColorModeValue, useTheme } from "@chakra-ui/react"
+import { Box, Checkbox, Flex, HStack, IconButton, Menu, MenuButton, MenuItem, MenuList, Skeleton, Spacer, Spinner, Table, TableCaption, TableContainer, Tbody, Td, Tfoot, Th, Thead, Tr, VStack, useColorModeValue, useTheme } from "@chakra-ui/react"
 import { BreadcrumbPath } from "@/app/(components)/breadcrumb-path"
 import FileTable from "./file-table"
 import { RowSelectionState } from "@tanstack/react-table"
@@ -10,31 +10,55 @@ import { BsFillGrid3X3GapFill } from "react-icons/bs"
 import { FaList } from "react-icons/fa"
 import ColorModeSensitiveBox from "@/app/(components)/custom-chakra/color-mode-box"
 import { fileMetadataService } from "@/service/filemetadata/fileservice-provider"
+import Dropzone, { useDropzone } from "react-dropzone"
+import { UploadContext } from "@/app/(components)/global_layout/file-upload-component"
 
 export interface MainContentProps {
-    // files: FileMetadata[],
     path: string[]
 }
+
+
+
 
 export const SelectedFilesContext = createContext<FileMetadata[]>([]);
 export const AllFilesContext = createContext<FileMetadata[]>([]);
 export const CurrentPathContext = createContext<string[]>([]);
+
+
 export default function MainContent({ path }: MainContentProps) {
+    const uploadContext = useContext(UploadContext);
+    const currPath: string = useMemo(() => {return "/" + path.join("/")}, [path]);
     const [files, setFiles] = useState<FileMetadata[]>([]);
     const [isFetching, setIsFetching] = useState<boolean>(true);
     const [selectedItems, setSelectedItems] = useState<RowSelectionState>({});
     const [renderAsGrid, setRenderAsGrid] = useState<boolean>(true);
-    const selectedFileMetadata: FileMetadata[] = Object.keys(selectedItems).map(key => files[parseInt(key)]);
+    const selectedFileMetadata: FileMetadata[] = useMemo(() => {
+        return Object.keys(selectedItems).map(key => files[parseInt(key)]);
+    }, [selectedItems]);
     const allItemsChecked: boolean = selectedFileMetadata.length == files.length;
     const indeterminate = selectedFileMetadata.length > 0 && !allItemsChecked;
 
     useEffect(() => {
-
-        fileMetadataService.listDirectory("/" + path.join("/")).then(file => {
+        fileMetadataService.listDirectory(path.join("/")).then(file => {
             setFiles(file);
             setIsFetching(false);
         });
     }, []);
+
+
+    useEffect(() => {
+        console.log('hello')
+        if(uploadContext.items.length) {
+            const pathMatchingFiles = uploadContext.items.filter(file => file.path === currPath);
+            uploadContext.items.forEach(file => console.log(`${JSON.stringify(file)}  ${currPath}`))
+            setFiles((prev) => [...prev, ...pathMatchingFiles]);
+            uploadContext.setItems([]);
+            return;
+        }
+    }, [uploadContext]);
+
+
+    console.log('RENDERING!!!')
 
     const onItemSelect = (index: number) => {
         setSelectedItems(prevState => {
@@ -56,7 +80,7 @@ export default function MainContent({ path }: MainContentProps) {
         <AllFilesContext.Provider value={files}>
             <SelectedFilesContext.Provider value={selectedFileMetadata}>
                 <CurrentPathContext.Provider value={path}>
-                    <Box  >
+                    <Box id="BOX_ID" display={'flex'} minH={'100%'} flexDirection={'column'}>
                         <ColorModeSensitiveBox marginBottom='10px' style={{ position: "sticky", top: 0, zIndex: 3, }}>
 
                             <BreadcrumbPath style={{ padding: '5px' }} paths={path} max_visible_items={4} paths_decoded={false} />
@@ -64,10 +88,10 @@ export default function MainContent({ path }: MainContentProps) {
                                 <FileButtons />
                                 <Spacer />
                                 {
-                                    selectedFileMetadata.length > 0 ?
-                                        <span>
-                                            {`${selectedFileMetadata.length} selected`}
-                                        </span> : <></>
+                                    selectedFileMetadata.length > 0 &&
+                                    <span>
+                                        {`${selectedFileMetadata.length} selected`}
+                                    </span>
                                 }
                                 <Checkbox size={'lg'}
                                     isIndeterminate={indeterminate}
@@ -98,13 +122,44 @@ export default function MainContent({ path }: MainContentProps) {
                                 </Menu>
                             </HStack>
                         </ColorModeSensitiveBox>
-                        <Box>
-                            {
-                                renderAsGrid ?
-                                    <FileGrid isFetching={isFetching} files={files} selection={selectedItems} onItemSelect={onItemSelect}></FileGrid> :
-                                    <FileTable files={files} selection={selectedItems} selectionCallback={setSelectedItems}></FileTable>
-                            }
-                        </Box>
+                        <Dropzone onDrop={acceptedFiles => {
+                            acceptedFiles.forEach(file =>uploadContext.upload(currPath, file));
+                        }}>
+                            {({ getRootProps, getInputProps, isDragActive }) => (
+                                <Box display={'flex'} flex={1} flexDirection={'column'}>
+                                    <Box {...getRootProps({
+                                        onClick: event => event.stopPropagation(),
+                                        // onDrop: (acceptedFiles: File[]) => {
+                                        //     console.log('files: ' + acceptedFiles);
+                                        // }  ,
+                                        style: {flex:'1', flexDirection:'column', display:'flex'}
+                                        
+                                   })
+                                   }>
+                                        <input {...getInputProps()} />
+                                        <Box id="file-main-content"
+                                            display={'flex'}
+                                            flexDirection={'column'}
+                                            flex={1}
+                                            position={'relative'}
+                                            outline={isDragActive ? 'thin solid green' : ''}
+                                            >
+                                            {
+                                                renderAsGrid ?
+                                                    <FileGrid isFetching={isFetching} files={files} selection={selectedItems} onItemSelect={onItemSelect}></FileGrid> :
+                                                    <FileTable files={files} selection={selectedItems} selectionCallback={setSelectedItems}></FileTable>
+                                            }
+                                            {
+                                                isDragActive && 
+                                                <Box position={'absolute'} left={'50%'} top={'50%'}>
+                                                    Drop files
+                                                </Box>
+                                            }
+                                        </Box>
+                                    </Box>
+                                </Box>
+                            )}
+                        </Dropzone>
                     </Box>
                 </CurrentPathContext.Provider>
             </SelectedFilesContext.Provider>

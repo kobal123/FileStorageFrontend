@@ -59,7 +59,16 @@ export default function FileMoveModal({ isOpen, onOpen = () => { }, onClose = ()
 							const temp: string[] = newPath.split("/");
 							setCurrentPath(temp.filter(pathSegment => pathSegment.length));
 						}
-					} />
+					
+						
+					}
+					onDirectoryChangedCallback={
+						(newPath: string) => {
+							const temp: string[] = newPath.split("/");
+							setCurrentPath(temp.filter(pathSegment => pathSegment.length));
+						}
+					}
+					/>
 
 				</ModalBody>
 				<ModalFooter>

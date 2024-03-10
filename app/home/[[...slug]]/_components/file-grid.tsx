@@ -25,7 +25,6 @@ export interface FileGridProp {
 
 function GridSkeleton({ numberOfGrids }: { numberOfGrids: number }) {
     const dummy = Array(numberOfGrids).fill(0);
-    console.log(dummy);
     return (
         dummy.map(() => {
             return (<Box className="col folder">
@@ -58,7 +57,7 @@ export default function FileGrid({ files, selection, onItemSelect, isFetching }:
             <div className="file-container">
                 <div className="wrapper" id="wrapper">
                     {
-                        isFetching ? <GridSkeleton numberOfGrids={4} /> :
+                        isFetching ? <GridSkeleton numberOfGrids={20} /> :
                             files.map((file, index) => {
                                 return (
                                     <Box className="col folder"

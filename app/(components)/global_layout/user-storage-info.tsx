@@ -1,29 +1,23 @@
 'use client'
 
-import { Box, Progress } from "@chakra-ui/react"
+import { userservice } from "@/service/user/userservice-provider"
+import { formatBytes } from "@/util/byte-format"
+import { Box, Progress, Text, VStack } from "@chakra-ui/react"
 
-export interface UserStorageInformation {
-    max_bytes: number,
-    used_bytes: number
-}
 
-function UserStorageComponent() {
-    // 'use client'
-
-    // console.log('HELLO CLIENT!');
-    return (
-        <div>hello from client component</div>
-    )
-}
 
 
 export default function UserStorageInfo() {
-    return (
-        <Box paddingLeft={'10px'} paddingRight={'10px'}>
-            Storage
 
-            20.44 MB used of 2 GB
-            <Progress value={70}></Progress>
+    const storageInfo = userservice.getStorageInfo();
+
+    return (
+        <Box paddingLeft={'10px'} paddingRight={'10px'} >
+            <VStack >
+                <Text fontSize={'1.5rem'}>Storage</Text>
+                <Text>{`${formatBytes(storageInfo.used_bytes)} used of ${formatBytes(storageInfo.max_bytes)}`}</Text>
+            </VStack>
+            <Progress marginTop={'5px'} value={(storageInfo.used_bytes / storageInfo.max_bytes)*100}></Progress>
         </Box>
     )
 }

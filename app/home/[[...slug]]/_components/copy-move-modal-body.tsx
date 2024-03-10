@@ -9,9 +9,12 @@ import { FaFile, FaFolder } from "react-icons/fa";
 
 export interface FileModalBodyProps {
     onSelectCallback?: (newPath: string) => void,
+    onDirectoryChangedCallback?: (newPath: string) => void,
     _path: string[]
 }
-export default function FileModalBody({onSelectCallback = () => {}, _path}: FileModalBodyProps) {
+export default function FileModalBody({onSelectCallback = () => {},
+                                      _path,
+                                      onDirectoryChangedCallback = () => {}}: FileModalBodyProps) {
     const [files, setFiles] = useState<FileMetadata[]>([]);
     const [selectedFile, setSelectedFile] = useState<FileMetadata | null>(null);
     const [directoryToList, setdirectoryToList] = useState<FileMetadata | null>(null);
@@ -19,22 +22,23 @@ export default function FileModalBody({onSelectCallback = () => {}, _path}: File
     const {colorMode} = useColorMode();
 
     useEffect(() => {
-        if (directoryToList != null) {
-            fileMetadataService.listDirectory(directoryToList.full_path)
-            .then(filemetadata => {
-                setFiles(filemetadata);
-                setIsFetching(false);
-                onSelectCallback(directoryToList.full_path);
-                setdirectoryToList(null);
-            });
+        console.log("path changed");
+        // if (directoryToList != null) {
+        //     fileMetadataService.listDirectory(directoryToList.full_path)
+        //     .then(filemetadata => {
+        //         setFiles(filemetadata);
+        //         setIsFetching(false);
+        //         onSelectCallback(directoryToList.full_path);
+        //         setdirectoryToList(null);
+        //     });
 
-        } else {
-            fileMetadataService.listDirectory("/" + _path.join("/"))
+        // } else {
+            fileMetadataService.listDirectory(_path.join("/"))
             .then(filemetadata => {
                 setFiles(filemetadata);
                 setIsFetching(false);
             });
-        }
+        // }
 
     }, [_path]);
 
@@ -57,12 +61,16 @@ export default function FileModalBody({onSelectCallback = () => {}, _path}: File
                                 }
                             }
                             key={file.full_path}
-                            onDoubleClick={() => {setIsFetching(true); setdirectoryToList(file); setSelectedFile(null)}}
+                            onDoubleClick={() => {
+                                    // setIsFetching(true); setdirectoryToList(file); setSelectedFile(null);console.log("double clicked")
+                                    onDirectoryChangedCallback(file.full_path);
+                                }
+                            }
                             onClick={() => {
                                 // setIsFetching(true);
                                 setSelectedFile(file);
                             }}>
-                                <ListIcon as={FaFolder}></ListIcon>
+                            <ListIcon as={FaFolder}></ListIcon>
                             <span>{file.name}</span>
                         </ListItem>
                     )

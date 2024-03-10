@@ -1,6 +1,6 @@
-'use client'
 import LocalDevelopmentFileMetadataService from "./dev/local-dev-fileservice";
 import { FileMetadataService } from "./fileservice-interface";
+import PorductionFileMetaDataService from "./prod/prod-fileservice";
 
 let service: FileMetadataService | null = null;
 
@@ -10,8 +10,7 @@ if (process.env.NODE_ENV === 'development') {
     service = new LocalDevelopmentFileMetadataService();
 } else {
     console.log('You are in production environment');
-    service = new LocalDevelopmentFileMetadataService();
-
+    service = new PorductionFileMetaDataService();
 }
 
 export const fileMetadataService = service;
